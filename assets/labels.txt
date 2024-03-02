@@ -1,0 +1,38 @@
+Traffic Light
+Stop Sign
+Speed Limit (50km/h)
+Speed Limit (70km/h)
+Speed Limit (80km/h)
+Speed Limit (40km/h)
+Speed Limit (20km/h)
+Speed Limit (30km/h)
+Speed Limit (60km/h)
+Speed Limit (90km/h)
+Speed Limit (100km/h)
+Speed Limit (110km/h)
+Speed Limit (120km/h)
+Speed Limit (130km/h)
+Crosswalk
+Uneven Road
+Turn Right Ahead
+Turn Left Ahead
+Straight Ahead Only
+Slippery Road Ahead
+Roundabout
+Pedestrian Crossing
+Overtaking by Trucks is Prohibited
+Road Narrows on Right
+Attention Please
+Beware of Children
+Cycle Route Ahead Warning
+Dangerous Left Curve
+Dangerous Right Curve
+End of All Speed and Passing Limits
+Give Way, Go Straight, or Turn Right
+Go Straight or Turn Left
+Keep Left
+Keep Right
+Left Zigzag Traffic
+No Entry
+No Overtaking
+Truck Traffic is Prohibited
