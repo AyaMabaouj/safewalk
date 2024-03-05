@@ -1,185 +1,232 @@
 import 'package:flutter/material.dart';
 import 'package:safewalk/screens/SafeWalk.dart';
 import 'package:safewalk/screens/textRecogonition.dart';
-import 'package:safewalk/utils/voiceCommande.dart';
+import 'package:safewalk/utils/map.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
   @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  stt.SpeechToText _speech = stt.SpeechToText();
+  bool _isListening = false;
+  String _text = '';
+
+ @override
   Widget build(BuildContext context) {
+    List<String> options = [
+      'Object Detection',
+      'Text Recognition',
+      'Navigation',
+      'Settings',
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'HomePage',
-          style: TextStyle(
-            color: Colors.white,
-          ),
+          'Home',
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings,color: Colors.white,),
-            onPressed: () {
-              // Mettez ici le code pour la gestion du clic sur l'icône des paramètres
-            },
-          ),
-        ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.blue, // Background color under Welcome message
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(30),
-                      bottomRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Image.asset(
-                        'assets/welcome.gif',
-                        width: 500,
-                        height: 200,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20), // Espacement entre le cercle et les cartes
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: Card(
-                      elevation: 3,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => SafeWalk()), // Navigate to SafeWalk class
-                          );                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.image_search,
-                                size: 100,
-                                color: Colors.blue,
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                'Détection d\'objets',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Card(
-                      elevation: 3,
-                      child: InkWell(
-                        onTap: () {
-                           Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => TextRecognitionApp()), 
-                          );                          },
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.text_fields,
-                                size: 100,
-                                color: Colors.blue,
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                'Détection de texte',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => VoiceCommandApp()), 
-                          );  
-                      },
-                      child: Card(
-                        shape: CircleBorder(),
-                        elevation: 5,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              Container(
-                                child: CircleAvatar(
-                                  radius: 70, // Réduire la taille du cercle
-                                  backgroundColor: Colors.transparent,
-                                  child: Icon(
-                                    Icons.mic,
-                                    color:Colors.blue,
-                                    size: 100, // Réduire la taille de l'icône
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                'Commande\nvocale',
-                                style: TextStyle(
-                                  fontSize: 20, // Réduire la taille de la police
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                Image.asset(
+                  'assets/welcome.gif',
+                  width: 500,
+                  height: 150,
                 ),
               ],
+            ),
+          ),
+          Expanded(
+            child: GridView.builder(
+              shrinkWrap: true,
+              padding: EdgeInsets.all(20),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 20.0,
+                mainAxisSpacing: 20.0,
+              ),
+              itemCount: options.length,
+              itemBuilder: (context, index) {
+                return buildOptionCard(options[index]);
+              },
+            ),
+          ),
+          // Ajouter la CardView de la commande vocale
+          buildOptionCard('CommandeVocale'),
+        ],
+      ),
+    );
+  }
+
+  Widget buildOptionCard(String option) {
+    IconData iconData;
+
+    switch (option) {
+      case 'Object Detection':
+        iconData = Icons.search;
+        break;
+      case 'Text Recognition':
+        iconData = Icons.text_fields;
+        break;
+      case 'Navigation':
+        iconData = Icons.navigation;
+        break;
+      case 'Settings':
+        iconData = Icons.settings;
+        break;
+      case 'CommandeVocale':
+        iconData = Icons.mic;
+        return Center(
+          child: GestureDetector(
+            onTap: () {
+              if (!_isListening) {
+                startListening();
+              } else {
+                stopListening();
+              }
+            },
+            child: Card(
+              shape: CircleBorder(),
+              elevation: 4.0,
+              child: Padding(
+                padding: EdgeInsets.all(24.0),
+                child: Icon(
+                  Icons.mic,
+                  color: Colors.blue,
+                  size: 100,
+                ),
+                
+              ),
+            ),
+            
+          ),
+        );
+      default:
+        iconData = Icons.error;
+    }
+
+    return Card(
+      elevation: 4.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      child: InkWell(
+        onTap: () {
+          if (option == 'Object Detection') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SafeWalk()),
+            );
+          } else if (option == 'Text Recognition') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => TextRecognitionApp()),
+            );
+          } else if (option == 'Navigation') {
+            
+               // MapUtils.openMap();
+
+            // Handle Navigation option
+          } else if (option == 'Settings') {
+            // Handle Settings option
+          }
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              iconData,
+              size: 65,
+              color: Colors.blue,
+            ),
+            SizedBox(height: 16.0),
+            Text(
+              option,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
       ),
     );
   }
+void startListening() async {
+  // Initialize SpeechToText instance if it's not already initialized
+  if (!_speech.isAvailable) {
+    await _speech.initialize();
+  }
+
+  // Check again if it's available after initialization
+  if (_speech.isAvailable) {
+    try {
+      await _speech.listen(
+        onResult: (result) {
+          setState(() {
+            _text = result.recognizedWords;
+          });
+          handleVoiceCommand(_text);
+        },
+      );
+      setState(() {
+        _isListening = true;
+      });
+    } catch (error) {
+      print('Error: $error');
+    }
+  } else {
+    print('Speech recognition is not available');
+  }
+}
+
+
+  void stopListening() {
+    _speech.stop();
+    setState(() {
+      _isListening = false;
+    });
+  }
+
+  void handleVoiceCommand(String command) {
+    print('Command recognized: $command');
+    if (command.toLowerCase() == 'open object détection') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => SafeWalk()),
+      );
+    } else if (command.toLowerCase() == 'open text détection') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => TextRecognitionApp()),
+      );
+    }
+  }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: HomePage(),
+  ));
 }

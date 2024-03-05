@@ -1,3 +1,5 @@
+import 'dart:convert'; // Added dart:convert
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:alan_voice/alan_voice.dart';
@@ -33,8 +35,20 @@ class _VoiceCommandState extends State<VoiceCommand> {
     // Handle commands from Alan AI Studio
     AlanVoice.onCommand.add((command) {
       debugPrint("got new command ${command.toString()}");
-      _handleCommand(command.data);
+      _handleCommand(command?.data); // Added null check for command
     });
+    _playCommand();
+  }
+
+  @override
+  void dispose() {
+    AlanVoice.onCommand.remove(_handleCommand);
+    super.dispose();
+  }
+  void _playCommand() {
+    /// Providing any params with json
+    var command = jsonEncode({"action":"openHomePage"});
+    AlanVoice.playCommand(command);
   }
 
   void _requestMicrophonePermission() async {
@@ -50,9 +64,10 @@ class _VoiceCommandState extends State<VoiceCommand> {
     }
   }
 
-  void _handleCommand(Map<String, dynamic> command) {
+  void _handleCommand(Map<String, dynamic>? command) { // Added null safety
+    if (command == null) return; // Added null check
     // Access the command from the Map command.data
-    final String commandName = command["command"];
+    final String? commandName = command["command"];
 
     switch (commandName) {
       case "back":

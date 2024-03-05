@@ -43,6 +43,11 @@ dependencies:
   flutter_langdetect: ^0.0.2
   alan_voice: ^4.5.0
   permission_handler: ^10.3.0
+  speech_to_text: ^6.6.1
+  flutter_local_notifications: ^16.3.2
+  url_launcher: ^6.2.5
+
+
 
 
 
