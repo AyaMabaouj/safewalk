@@ -4,9 +4,8 @@ import 'package:flutter_langdetect/flutter_langdetect.dart' as langdetect;
 import 'package:flutter/services.dart';
 import 'package:flutter_mobile_vision_2/flutter_mobile_vision_2.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-
+import 'package:safewalk/utils/qrcodeScanner.dart';
 import '../utils/barcode_detail.dart';
-import '../utils/face_detail.dart';
 import '../utils/ocr_text_detail.dart';
 
 class TextRecognitionApp extends StatefulWidget {
@@ -66,13 +65,7 @@ class _TextRecognitionAppState extends State<TextRecognitionApp> {
   Size? _previewOcr;
   List<OcrText> _textsOcr = [];
 
-  int? _cameraFace = FlutterMobileVision.CAMERA_FRONT;
-  bool _autoFocusFace = true;
-  bool _torchFace = false;
-  bool _multipleFace = true;
-  bool _showTextFace = true;
-  Size? _previewFace;
-  List<Face> _faces = [];
+ 
 
   ///
   ///
@@ -89,7 +82,6 @@ class _TextRecognitionAppState extends State<TextRecognitionApp> {
           }
           _previewBarcode = previewSizes[_cameraBarcode]!.first;
           _previewOcr = previewSizes[_cameraOcr]!.first;
-          _previewFace = previewSizes[_cameraFace]!.first;
         }));
   }
 
@@ -112,7 +104,7 @@ class _TextRecognitionAppState extends State<TextRecognitionApp> {
           appBar: AppBar(
             bottom: TabBar(
               indicatorColor: Colors.black54,
-              tabs: [Tab(text: 'Barcode'), Tab(text: 'OCR'), Tab(text: 'Face')],
+              tabs: [Tab(text: 'Barcode'), Tab(text: 'OCR'), Tab(text: 'QRCode')],
             ),
             title: Text('Text Recoginition'),
 
@@ -126,8 +118,7 @@ class _TextRecognitionAppState extends State<TextRecognitionApp> {
           body: TabBarView(children: [
             _getBarcodeScreen(context),
             _getOcrScreen(context),
-            _getFaceScreen(context),
-          ]),
+            _getQRScreen(context), ]),
         ),
       ),
     );
@@ -531,136 +522,12 @@ class _TextRecognitionAppState extends State<TextRecognitionApp> {
   }
 
   ///
-  /// Face Screen
+  /// QRCODE Screen
   ///
-  Widget _getFaceScreen(BuildContext context) {
-    List<Widget> items = [];
-
-    items.add(Padding(
-      padding: const EdgeInsets.only(
-        top: 8.0,
-        left: 18.0,
-        right: 18.0,
-      ),
-      child: const Text('Camera:'),
-    ));
-
-    items.add(Padding(
-      padding: const EdgeInsets.only(
-        left: 18.0,
-        right: 18.0,
-      ),
-      child: DropdownButton<int>(
-        items: _getCameras(),
-        onChanged: (value) {
-          _previewFace = null;
-          setState(() => _cameraFace = value);
-        },
-        value: _cameraFace,
-      ),
-    ));
-
-    items.add(Padding(
-      padding: const EdgeInsets.only(
-        top: 8.0,
-        left: 18.0,
-        right: 18.0,
-      ),
-      child: const Text('Preview size:'),
-    ));
-
-    items.add(Padding(
-      padding: const EdgeInsets.only(
-        left: 18.0,
-        right: 18.0,
-      ),
-      child: DropdownButton<Size>(
-        items: _getPreviewSizes(_cameraFace ?? 0),
-        onChanged: (value) {
-          setState(() => _previewFace = value);
-        },
-        value: _previewFace,
-      ),
-    ));
-
-    items.add(SwitchListTile(
-      title: const Text('Auto focus:'),
-      value: _autoFocusFace,
-      onChanged: (value) => setState(() => _autoFocusFace = value),
-    ));
-
-    items.add(SwitchListTile(
-      title: const Text('Torch:'),
-      value: _torchFace,
-      onChanged: (value) => setState(() => _torchFace = value),
-    ));
-
-    items.add(SwitchListTile(
-      title: const Text('Show text:'),
-      value: _showTextFace,
-      onChanged: (value) => setState(() => _showTextFace = value),
-    ));
-
-    items.add(
-      Padding(
-        padding: const EdgeInsets.only(
-          left: 18.0,
-          right: 18.0,
-          bottom: 12.0,
-        ),
-        child: ElevatedButton(
-          onPressed: _detect,
-          child: Text('DETECT!',style: TextStyle(color: Colors.white),),
-           style: ElevatedButton.styleFrom(
-    backgroundColor:  Color.fromARGB(255, 108, 149, 245) // Set button color to blue
-  ),
-        ),
-      ),
-    );
-
-    items.addAll(
-      ListTile.divideTiles(
-        context: context,
-        tiles: _faces
-            .map(
-              (face) => FaceDetail(face),
-            )
-            .toList(),
-      ),
-    );
-
-    return ListView(
-      padding: const EdgeInsets.only(
-        top: 12.0,
-      ),
-      children: items,
-    );
-  }
-
-  ///
-  /// Face Method
-  ///
-  Future<Null> _detect() async {
-    List<Face> faces = [];
-
-    try {
-      faces = await FlutterMobileVision.face(
-        flash: _torchFace,
-        autoFocus: _autoFocusFace,
-        multiple: _multipleFace,
-        showText: _showTextFace,
-        camera: _cameraFace ?? FlutterMobileVision.CAMERA_FRONT,
-        preview: _previewFace ?? FlutterMobileVision.PREVIEW,
-      );
-    } on Exception {
-      faces.add(Face(-1));
-    }
-
-    if (!mounted) return;
-
-    setState(() => _faces = faces);
-  }
-
+ Widget _getQRScreen(BuildContext context) {
+  return QRViewExample();
+}
+  
   ///
   /// Speak method
 Future<void> _speak(String text, String language) async {
@@ -713,26 +580,6 @@ class OcrTextWidget extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class FaceWidget extends StatelessWidget {
-  final Face face;
-
-  FaceWidget(this.face);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.face),
-      title: Text(face.id.toString()),
-      trailing: const Icon(Icons.arrow_forward),
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => FaceDetail(face),
-        ),
-      ),
     );
   }
 }

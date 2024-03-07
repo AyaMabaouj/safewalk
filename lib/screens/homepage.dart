@@ -4,8 +4,9 @@ import 'package:safewalk/screens/settingPage.dart';
 import 'package:safewalk/screens/textRecogonition.dart';
 import 'package:safewalk/utils/map.dart';
 import 'package:safewalk/utils/objectdetect.dart';
-import 'package:safewalk/utils/voiceCommande.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+
+import '../utils/qrcodeScanner.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -165,7 +166,7 @@ class _HomePageState extends State<HomePage> {
           if (option == 'Object Detection') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => objectDetect()),
+              MaterialPageRoute(builder: (context) => SafeWalk()),
             );
           } else if (option == 'Text Recognition') {
             Navigator.push(
@@ -176,7 +177,7 @@ class _HomePageState extends State<HomePage> {
 
              Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SettingsPage()),
+              MaterialPageRoute(builder: (context) => QRViewExample()),
             );          }
         },
         child: Column(
