@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:safewalk/screens/SafeWalk.dart';
+import 'package:safewalk/screens/settingPage.dart';
 import 'package:safewalk/screens/textRecogonition.dart';
 import 'package:safewalk/utils/map.dart';
+import 'package:safewalk/utils/objectdetect.dart';
+import 'package:safewalk/utils/voiceCommande.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class HomePage extends StatefulWidget {
@@ -16,7 +19,7 @@ class _HomePageState extends State<HomePage> {
   bool _isListening = false;
   String _text = '';
 
- @override
+  @override
   Widget build(BuildContext context) {
     List<String> options = [
       'Object Detection',
@@ -70,7 +73,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
           ),
-          // Ajouter la CardView de la commande vocale
+          // Add the CardView for voice command
           buildOptionCard('CommandeVocale'),
         ],
       ),
@@ -89,7 +92,37 @@ class _HomePageState extends State<HomePage> {
         break;
       case 'Navigation':
         iconData = Icons.navigation;
-        break;
+        return InkWell(
+          onTap: () {
+          MapUtils.openMap();
+          },
+          child: Card(
+            elevation: 4.0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  iconData,
+                  size: 65,
+                  color: Colors.blue,
+                ),
+                SizedBox(height: 16.0),
+                Text(
+                  option,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       case 'Settings':
         iconData = Icons.settings;
         break;
@@ -114,10 +147,8 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.blue,
                   size: 100,
                 ),
-                
               ),
             ),
-            
           ),
         );
       default:
@@ -134,21 +165,19 @@ class _HomePageState extends State<HomePage> {
           if (option == 'Object Detection') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SafeWalk()),
+              MaterialPageRoute(builder: (context) => objectDetect()),
             );
           } else if (option == 'Text Recognition') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => TextRecognitionApp()),
             );
-          } else if (option == 'Navigation') {
-            
-               // MapUtils.openMap();
-
-            // Handle Navigation option
           } else if (option == 'Settings') {
-            // Handle Settings option
-          }
+
+             Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SettingsPage()),
+            );          }
         },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -173,34 +202,34 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-void startListening() async {
-  // Initialize SpeechToText instance if it's not already initialized
-  if (!_speech.isAvailable) {
-    await _speech.initialize();
-  }
 
-  // Check again if it's available after initialization
-  if (_speech.isAvailable) {
-    try {
-      await _speech.listen(
-        onResult: (result) {
-          setState(() {
-            _text = result.recognizedWords;
-          });
-          handleVoiceCommand(_text);
-        },
-      );
-      setState(() {
-        _isListening = true;
-      });
-    } catch (error) {
-      print('Error: $error');
+  void startListening() async {
+    // Initialize SpeechToText instance if it's not already initialized
+    if (!_speech.isAvailable) {
+      await _speech.initialize();
     }
-  } else {
-    print('Speech recognition is not available');
-  }
-}
 
+    // Check again if it's available after initialization
+    if (_speech.isAvailable) {
+      try {
+        await _speech.listen(
+          onResult: (result) {
+            setState(() {
+              _text = result.recognizedWords;
+            });
+            handleVoiceCommand(_text);
+          },
+        );
+        setState(() {
+          _isListening = true;
+        });
+      } catch (error) {
+        print('Error: $error');
+      }
+    } else {
+      print('Speech recognition is not available');
+    }
+  }
 
   void stopListening() {
     _speech.stop();

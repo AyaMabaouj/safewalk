@@ -1,7 +1,6 @@
-import 'dart:convert'; // Added dart:convert
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:alan_voice/alan_voice.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -27,17 +26,7 @@ class _VoiceCommandState extends State<VoiceCommand> {
   @override
   void initState() {
     super.initState();
-    _requestMicrophonePermission();
-
-    // Initialize Alan button with your Alan AI Studio project key
-    AlanVoice.addButton("c77bf737e45a8600dfa57d6594e3f9422e956eca572e1d8b807a3e2338fdd0dc/stage");
-
-    // Handle commands from Alan AI Studio
-    AlanVoice.onCommand.add((command) {
-      debugPrint("got new command ${command.toString()}");
-      _handleCommand(command?.data); // Added null check for command
-    });
-    _playCommand();
+    _initializeAlan();
   }
 
   @override
@@ -45,13 +34,21 @@ class _VoiceCommandState extends State<VoiceCommand> {
     AlanVoice.onCommand.remove(_handleCommand);
     super.dispose();
   }
-  void _playCommand() {
-    /// Providing any params with json
-    var command = jsonEncode({"action":"openHomePage"});
-    AlanVoice.playCommand(command);
+
+  void _initializeAlan() async {
+    await _requestMicrophonePermission();
+
+    AlanVoice.addButton("c77bf737e45a8600dfa57d6594e3f9422e956eca572e1d8b807a3e2338fdd0dc/stage");
+
+    AlanVoice.onCommand.add((command) {
+      debugPrint("got new command ${command.toString()}");
+      _handleCommand(command?.data);
+    });
+
+    _playCommand();
   }
 
-  void _requestMicrophonePermission() async {
+  Future<void> _requestMicrophonePermission() async {
     var status = await Permission.microphone.request();
     if (status.isGranted) {
       print("Microphone permission granted");
@@ -64,22 +61,23 @@ class _VoiceCommandState extends State<VoiceCommand> {
     }
   }
 
-  void _handleCommand(Map<String, dynamic>? command) { // Added null safety
-    if (command == null) return; // Added null check
-    // Access the command from the Map command.data
+  void _playCommand() {
+    var command = jsonEncode({"action": "openHomePage"});
+    AlanVoice.playText("Hello from Alan!");
+    AlanVoice.playCommand(command);
+  }
+
+  void _handleCommand(Map<String, dynamic>? command) {
+    if (command == null) return;
     final String? commandName = command["command"];
 
     switch (commandName) {
       case "back":
-        // Ensure context is available before popping
         if (Navigator.canPop(context)) {
           Navigator.pop(context);
         }
         break;
-      // Add other command cases here
-      // ...
       default:
-        // Handle unrecognized commands
         print("Unrecognized command: $commandName");
     }
   }

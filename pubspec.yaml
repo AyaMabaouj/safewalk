@@ -46,6 +46,8 @@ dependencies:
   speech_to_text: ^6.6.1
   flutter_local_notifications: ^16.3.2
   url_launcher: ^6.2.5
+  geolocator: ^8.2.1	
+  google_maps_flutter: ^2.2.8
 
 
 
