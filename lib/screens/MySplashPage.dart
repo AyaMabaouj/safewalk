@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:safewalk/screens/homepage.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:safewalk/screens/authentificationFingerPrint';
+
 
 class MySplashPage extends StatefulWidget {
   const MySplashPage({Key? key}) : super(key: key);
@@ -12,6 +14,7 @@ class _MySplashPageState extends State<MySplashPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+FlutterTts flutterTts = FlutterTts();
 
   @override
   void initState() {
@@ -46,10 +49,17 @@ class _MySplashPageState extends State<MySplashPage>
 
   // Méthode pour naviguer vers la page d'accueil
   void navigateToHomePage() {
+      speakText("Welcome! Please use your finger to authenticate successfully.");
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => HomePage()),
+      MaterialPageRoute(builder: (context) => AuthentificationFingerPrint()),
     );
+    
   }
+void speakText(String text) async {
+  await flutterTts.setLanguage("en-US");
+  await flutterTts.setPitch(1);
+  await flutterTts.speak(text);
+}
 
   @override
   Widget build(BuildContext context) {

@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(
           'Home',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Color.fromARGB(255, 10, 2, 60)),
         ),
         backgroundColor: Colors.blue,
       ),
@@ -177,7 +177,7 @@ class _HomePageState extends State<HomePage> {
 
              Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => QRViewExample()),
+              MaterialPageRoute(builder: (context) => SettingsPage()),
             );          }
         },
         child: Column(
