@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:safewalk/screens/authentificationFingerPrint';
-
+import 'package:safewalk/screens/authentificationFingerPrint.dart';
 
 class MySplashPage extends StatefulWidget {
   const MySplashPage({Key? key}) : super(key: key);

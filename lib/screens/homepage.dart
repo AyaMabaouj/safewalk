@@ -3,10 +3,7 @@ import 'package:safewalk/screens/SafeWalk.dart';
 import 'package:safewalk/screens/settingPage.dart';
 import 'package:safewalk/screens/textRecogonition.dart';
 import 'package:safewalk/utils/map.dart';
-import 'package:safewalk/utils/objectdetect.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-
-import '../utils/qrcodeScanner.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -33,7 +30,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(
           'Home',
-          style: TextStyle(color: Color.fromARGB(255, 10, 2, 60)),
+          style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255)),
         ),
         backgroundColor: Colors.blue,
       ),
@@ -95,7 +92,7 @@ class _HomePageState extends State<HomePage> {
         iconData = Icons.navigation;
         return InkWell(
           onTap: () {
-          MapUtils.openMap();
+          MapUtils.openMap(context);
           },
           child: Card(
             elevation: 4.0,
