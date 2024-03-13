@@ -115,6 +115,7 @@ class _TextRecognitionAppState extends State<TextRecognitionApp>
   /// OCR Screen
   ///
   Widget _getOcrScreen(BuildContext context) {
+  speakText("Click on the Read button at the bottom to capture the text.");
     return OcrScreen(); 
   }
 
@@ -122,5 +123,7 @@ class _TextRecognitionAppState extends State<TextRecognitionApp>
     await flutterTts.setLanguage("en-US");
     await flutterTts.setPitch(1);
     await flutterTts.speak(text);
+    await flutterTts.setSpeechRate(0.5);
+
   }
 }

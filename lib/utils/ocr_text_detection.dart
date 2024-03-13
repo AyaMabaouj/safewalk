@@ -37,12 +37,13 @@ class OcrScreen extends StatefulWidget {
 
 class _OcrScreenState extends State<OcrScreen> {
   Size? _previewOcr;
-  int? _cameraOcr = FlutterMobileVision.CAMERA_BACK;
+  int _cameraOcr = FlutterMobileVision.CAMERA_BACK; // Default to back camera
   bool _autoFocusOcr = true;
   bool _torchOcr = false;
   bool _multipleOcr = true;
   bool _waitTapOcr = true;
-  bool _showTextOcr = true;
+    bool _showTextOcr = true;
+
   List<OcrText> _textsOcr = [];
   FlutterTts flutterTts = FlutterTts();
   String _platformVersion = 'Unknown'; // Initialize _platformVersion here
@@ -51,11 +52,7 @@ class _OcrScreenState extends State<OcrScreen> {
   void initState() {
     super.initState();
     initPlatformState();
-    FlutterMobileVision.start().then((previewSizes) {
-      setState(() {
-        _previewOcr = previewSizes[_cameraOcr]!.first;
-      });
-    });
+    _previewOcr = Size(2400, 1080); // Set the default preview size
     langdetect.initLangDetect();
   }
 
@@ -93,9 +90,9 @@ class _OcrScreenState extends State<OcrScreen> {
         autoFocus: _autoFocusOcr,
         multiple: _multipleOcr,
         waitTap: _waitTapOcr,
-        showText: _showTextOcr,
-        camera: _cameraOcr ?? FlutterMobileVision.CAMERA_BACK,
-        preview: _previewOcr ?? FlutterMobileVision.PREVIEW,
+        showText:_showTextOcr,
+        camera: _cameraOcr,
+        preview: _previewOcr ?? Size(2400, 1080), // Set the desired preview size here
       );
 
       // Detect language for each recognized text and speak accordingly
@@ -112,162 +109,96 @@ class _OcrScreenState extends State<OcrScreen> {
     setState(() => _textsOcr = texts);
   }
 
-  Widget _getOcrScreen(BuildContext context) {
-    List<Widget> items = [];
-
-    items.add(Padding(
-      padding: const EdgeInsets.only(
-        top: 8.0,
-        left: 18.0,
-        right: 18.0,
-      ),
-      child: const Text('Camera:'),
-    ));
-
-    items.add(Padding(
-      padding: const EdgeInsets.only(
-        left: 18.0,
-        right: 18.0,
-      ),
-      child: DropdownButton<int>(
-        items: _getCameras(),
-        onChanged: (value) {
-          _previewOcr = null;
-          setState(() => _cameraOcr = value);
-        },
-        value: _cameraOcr,
-      ),
-    ));
-
-    items.add(Padding(
-      padding: const EdgeInsets.only(
-        top: 8.0,
-        left: 18.0,
-        right: 18.0,
-      ),
-      child: const Text('Preview size:'),
-    ));
-
-    items.add(Padding(
-      padding: const EdgeInsets.only(
-        left: 18.0,
-        right: 18.0,
-      ),
-      child: DropdownButton<Size>(
-        items: _getPreviewSizes(_cameraOcr ?? 0),
-        onChanged: (value) {
-          setState(() => _previewOcr = value);
-        },
-        value: _previewOcr,
-      ),
-    ));
-
-    items.add(SwitchListTile(
-      title: const Text('Auto focus:'),
-      value: _autoFocusOcr,
-      onChanged: (value) => setState(() => _autoFocusOcr = value),
-    ));
-
-    items.add(SwitchListTile(
-      title: const Text('Torch:'),
-      value: _torchOcr,
-      onChanged: (value) => setState(() => _torchOcr = value),
-    ));
-
-    items.add(SwitchListTile(
-      title: const Text('Return all texts:'),
-      value: _multipleOcr,
-      onChanged: (value) => setState(() => _multipleOcr = value),
-    ));
-
-    items.add(SwitchListTile(
-      title: const Text('Capture when tap screen:'),
-      value: _waitTapOcr,
-      onChanged: (value) => setState(() => _waitTapOcr = value),
-    ));
-
-    items.add(SwitchListTile(
-      title: const Text('Show text:'),
-      value: _showTextOcr,
-      onChanged: (value) => setState(() => _showTextOcr = value),
-    ));
-
-    items.add(
+Widget _getOcrScreen(BuildContext context) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
       Padding(
-        padding: const EdgeInsets.only(
-          left: 18.0,
-          right: 18.0,
-          bottom: 12.0,
-        ),
-        child: ElevatedButton(
-          onPressed: _read,
-          child: Text(
-            'READ!',
-            style: TextStyle(color: Colors.white),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color.fromARGB(255, 108, 149, 245),
+        padding: const EdgeInsets.all(16.0),
+        child: Text(
+          'Manage Text Detection',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
-    );
-
-    items.addAll(
-      ListTile.divideTiles(
-        context: context,
-        tiles: _textsOcr.map((text) => OcrTextWidget(text)).toList(),
+      SwitchListTile(
+        title: const Text('Auto focus:'),
+        value: _autoFocusOcr,
+        onChanged: (value) => setState(() => _autoFocusOcr = value),
       ),
-    );
-
-    return ListView(
-      padding: const EdgeInsets.only(
-        top: 12.0,
+      SwitchListTile(
+        title: const Text('Torch:'),
+        value: _torchOcr,
+        onChanged: (value) => setState(() => _torchOcr = value),
       ),
-      children: items,
-    );
-  }
-
-  List<DropdownMenuItem<int>> _getCameras() {
-    List<DropdownMenuItem<int>> cameraItems = [];
-
-    cameraItems.add(DropdownMenuItem(
-      child: Text('BACK'),
-      value: FlutterMobileVision.CAMERA_BACK,
-    ));
-
-    cameraItems.add(DropdownMenuItem(
-      child: Text('FRONT'),
-      value: FlutterMobileVision.CAMERA_FRONT,
-    ));
-
-    return cameraItems;
-  }
-
-  List<DropdownMenuItem<Size>> _getPreviewSizes(int facing) {
-    List<DropdownMenuItem<Size>> previewItems = [];
-
-    List<Size>? sizes = FlutterMobileVision.getPreviewSizes(facing);
-
-    if (sizes != null) {
-      sizes.forEach((size) {
-        previewItems.add(
-          DropdownMenuItem(
-            child: Text(size.toString()),
-            value: size,
+      SwitchListTile(
+        title: const Text('Return all texts:'),
+        value: _multipleOcr,
+        onChanged: (value) => setState(() => _multipleOcr = value),
+      ),
+      SwitchListTile(
+        title: const Text('Capture when tap screen:'),
+        value: _waitTapOcr,
+        onChanged: (value) => setState(() => _waitTapOcr = value),
+      ),
+      SwitchListTile(
+        title: const Text('Show text:'),
+        value: _showTextOcr,
+        onChanged: (value) => setState(() => _showTextOcr = value),
+      ),
+      Expanded(
+        child: ListView(
+          padding: const EdgeInsets.only(
+            top: 12.0,
+            bottom: 12.0,
           ),
-        );
-      });
-    } else {
-      previewItems.add(
-        DropdownMenuItem(
-          child: Text('Empty'),
-          value: null,
+          children: _textsOcr.map((text) => OcrTextWidget(text)).toList(),
         ),
-      );
-    }
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 12.0),
+        child: Row(
+          children: [
+        Expanded(
+  child: Container(
+    width: double.infinity,
+    height: 70.0, // Définir la hauteur souhaitée
+    child: ElevatedButton.icon(
+      onPressed: () {
+        _read();
+        _speak("Tap on the screen to capture the text", "en");
+      },
+      icon: Icon(
+        Icons.play_arrow,
+        size: 40,
+        color: Colors.white,
+      ),
+      label: Text(
+        'READ!',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 23,
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+      ),
+    ),
+  ),
+),
 
-    return previewItems;
-  }
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+
+
 
   ///
   /// Speak method
