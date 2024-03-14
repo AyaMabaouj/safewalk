@@ -3,6 +3,7 @@ import 'package:safewalk/screens/SafeWalk.dart';
 import 'package:safewalk/screens/settingPage.dart';
 import 'package:safewalk/screens/textRecogonition.dart';
 import 'package:safewalk/utils/map.dart';
+import 'package:safewalk/utils/objectdetect.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class HomePage extends StatefulWidget {
@@ -163,7 +164,7 @@ class _HomePageState extends State<HomePage> {
           if (option == 'Object Detection') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SafeWalk()),
+              MaterialPageRoute(builder: (context) =>ObjectDetection() ),
             );
           } else if (option == 'Text Recognition') {
             Navigator.push(

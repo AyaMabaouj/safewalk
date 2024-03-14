@@ -30,7 +30,7 @@ class _TextRecognitionAppState extends State<TextRecognitionApp>
         _speak('This is text OCR detection', langdetect.detect("text"));
       } else if (_tabController.index == 1) {
         // Speak when QRCode/Barcode tab is selected
-        _speak('This is QRCode/Barcode Scanner', langdetect.detect("text"));
+        _speak('This is QRCode/Barcode Scanner,Click on the left button to capture the code and click on the right button to resume the camera', langdetect.detect("text"));
       }
     });
 
@@ -109,6 +109,7 @@ class _TextRecognitionAppState extends State<TextRecognitionApp>
   ///
   Widget _getCodeScreen(BuildContext context) {
     return CodeScanner();
+
   }
 
   ///

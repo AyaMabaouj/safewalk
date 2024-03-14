@@ -66,14 +66,14 @@ void speakText(String text) async {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white, // Changer la couleur de l'arrière-plan au besoin
+      backgroundColor: Colors.blue, // Changer la couleur de l'arrière-plan au besoin
       body: Center(
         child: ScaleTransition(
           scale: _animation,
           child: Image.asset(
-            "assets/logo.png",
-            width: screenWidth * 0.6, // Ajuster la taille au besoin
-            height: screenHeight * 0.6, // Ajuster la taille au besoin
+            "assets/logo2.png",
+            width: screenWidth * 0.8, // Ajuster la taille au besoin
+            height: screenHeight * 0.8, // Ajuster la taille au besoin
           ),
         ),
       ),
