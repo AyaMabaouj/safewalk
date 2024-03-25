@@ -39,14 +39,11 @@
         <activity android:name="ng.com.piccmaq.flutter.flutter_mobile_vision_2.ocr.OcrCaptureActivity" />
         <activity android:name="ng.com.piccmaq.flutter.flutter_mobile_vision_2.face.FaceCaptureActivity" />
         <activity android:name="ng.com.piccmaq.flutter.flutter_mobile_vision_2.barcode.BarcodeCaptureActivity" />
-
-
-
-
-
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+             <meta-data android:name="com.google.android.geo.API_KEY"
+           android:value="AIzaSyD5dzVaatnnokjnIFTlh2TFF3EDNCrQDjY"/>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility?hl=en and

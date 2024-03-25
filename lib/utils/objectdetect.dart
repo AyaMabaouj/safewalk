@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:developer';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tflite/flutter_tflite.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+
 
 class ObjectDetection extends StatefulWidget {
   @override
@@ -14,17 +17,17 @@ class _ObjectDetectionState extends State<ObjectDetection> {
   List<dynamic> _currentRecognition = [];
   late CameraController _cameraController;
   late Future<void> _initializeCameraControllerFuture;
-  late FlutterTts tts;
-  late int lastSpeakTime;
   Queue<CameraImage> _imageQueue = Queue();
   bool _isProcessing = false;
+  bool _isStreaming = false;
+FlutterTts flutterTts = FlutterTts();
+  late int lastSpeakTime = DateTime.now().millisecondsSinceEpoch;
 
   @override
   void initState() {
     super.initState();
     _initializeCameraControllerFuture = _initializeCamera();
     _loadModel();
-    tts = FlutterTts();
   }
 
   Future<void> _loadModel() async {
@@ -53,59 +56,70 @@ class _ObjectDetectionState extends State<ObjectDetection> {
     }
   }
 
-  void _startProcessing() {
-    if (!_isProcessing && _imageQueue.isNotEmpty) {
-      _isProcessing = true;
-      CameraImage img = _imageQueue.removeFirst();
-      _runModelOnFrame(img).then((_) {
-        _isProcessing = false;
-        _startProcessing();
-      });
-    }
+void _startProcessing() {
+  if (!_isProcessing && _imageQueue.isNotEmpty) {
+    _isProcessing = true;
+    int startTime = DateTime.now().millisecondsSinceEpoch; // Déplacez cela ici
+    CameraImage img = _imageQueue.removeFirst();
+    _runModelOnFrame(img).then((_) {
+     
+      _isProcessing = false;
+      _startProcessing(); // Continuez à traiter les images en file d'attente
+    });
+  }
+}
+
+Future<void> _runModelOnFrame(CameraImage img) async {
+  try {
+    List<dynamic>? recognitions = await Tflite.runModelOnFrame(
+      bytesList: img.planes.map((plane) => plane.bytes).toList(),
+      imageHeight: img.height,
+      imageWidth: img.width,
+      numResults: 1,
+    );
+
+    setState(() {
+      _currentRecognition = recognitions ?? [];
+    });
+
+    // Vérifiez d'abord s'il y a des détections avant de les traiter
+   
+     speakDetectedLabels(recognitions);
+    
+  } catch (e) {
+    print('Error running model on frame: $e');
   }
 
-  Future<void> _runModelOnFrame(CameraImage img) async {
-    try {
-      List? recognitions = await Tflite.runModelOnFrame(
-        bytesList: img.planes.map((plane) => plane.bytes).toList(),
-        imageHeight: img.height,
-        imageWidth: img.width,
-        numResults: 3,
-      );
-      setState(() {
-        _currentRecognition = recognitions ?? [];
-      });
-      _speakRecognitions(recognitions);
-    } catch (e) {
-      print('Error running model on frame: $e');
-    }
+}
+Future<void> speakText(String text) async {
+    await flutterTts.speak(text);
   }
 
-  Future<void> speakText(String text) async {
-    await tts.speak(text);
-  }
-
-  void _speakRecognitions(List<dynamic>? recognitions) {
-    if (recognitions != null) {
-      recognitions.forEach((re) async {
-        String label = "${re["detectedClass"]}";
+ void speakDetectedLabels(List<dynamic>? recognitions) {
+     if (_currentRecognition.isNotEmpty) {
+      var item = _currentRecognition.first; 
+      String label = item['label'] ?? 'Unknown';
+      double confidence = item['confidence'] * 100;
         int currentTime = DateTime.now().millisecondsSinceEpoch;
         if (currentTime - lastSpeakTime > 1000) {
           speakText(label);
           lastSpeakTime = currentTime;
         }
-      });
+      }
     }
-  }
-
-  void _startStreaming() {
-    if (_cameraController.value.isInitialized) {
-      _cameraController.startImageStream((CameraImage img) {
+ 
+void _startStreaming() {
+  if (!_isStreaming && _cameraController.value.isInitialized) {
+    _isStreaming = true;
+    _cameraController.startImageStream((CameraImage img) {
+      if (!_isProcessing) { // Vérifiez si la détection est en cours avant d'ajouter une nouvelle image
         _imageQueue.add(img);
         _startProcessing();
-      });
-    }
+      }
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -162,26 +176,26 @@ class _ObjectDetectionState extends State<ObjectDetection> {
         ),
         child: _currentRecognition.isNotEmpty
             ? ListView.builder(
-                itemCount: _currentRecognition.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(
-                      _currentRecognition[index]['label'] ?? 'Unknown',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    subtitle: Text(
-                      'Confidence: ${(_currentRecognition[index]['confidence'] * 100).toStringAsFixed(2)}%',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  );
-                },
-              )
-            : Center(
-                child: Text(
-                  'No objects detected',
-                  style: TextStyle(color: Colors.white),
-                ),
+          itemCount: _currentRecognition.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(
+                _currentRecognition[index]['label'] ?? 'Unknown',
+                style: TextStyle(color: Colors.white),
               ),
+              subtitle: Text(
+                'Confidence: ${(_currentRecognition[index]['confidence'] * 100).toStringAsFixed(2)}%',
+                style: TextStyle(color: Colors.white),
+              ),
+            );
+          },
+        )
+            : Center(
+          child: Text(
+            'No objects detected',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
       ),
     );
   }
@@ -190,7 +204,7 @@ class _ObjectDetectionState extends State<ObjectDetection> {
   void dispose() {
     _cameraController.dispose();
     Tflite.close();
-    tts.stop();
     super.dispose();
   }
+
 }

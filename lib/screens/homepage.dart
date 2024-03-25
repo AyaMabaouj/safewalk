@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:safewalk/screens/SafeWalk.dart';
+import 'package:safewalk/screens/myMap.dart';
 import 'package:safewalk/screens/settingPage.dart';
 import 'package:safewalk/screens/textRecogonition.dart';
 import 'package:safewalk/utils/map.dart';
@@ -91,37 +92,6 @@ class _HomePageState extends State<HomePage> {
         break;
       case 'Navigation':
         iconData = Icons.navigation;
-        return InkWell(
-          onTap: () {
-          MapUtils.openMap(context);
-          },
-          child: Card(
-            elevation: 4.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  iconData,
-                  size: 65,
-                  color: Colors.blue,
-                ),
-                SizedBox(height: 16.0),
-                Text(
-                  option,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
       case 'Settings':
         iconData = Icons.settings;
         break;
@@ -176,6 +146,12 @@ class _HomePageState extends State<HomePage> {
              Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => SettingsPage()),
+            );          }
+            else if (option == 'Navigation') {
+
+             Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MapExample()),
             );          }
         },
         child: Column(

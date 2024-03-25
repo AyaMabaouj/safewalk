@@ -15,7 +15,7 @@ class SafeWalk extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('SafeWalk'),
+          title: Text('Object Detection'),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
