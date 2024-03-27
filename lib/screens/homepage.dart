@@ -4,6 +4,7 @@ import 'package:safewalk/screens/myMap.dart';
 import 'package:safewalk/screens/settingPage.dart';
 import 'package:safewalk/screens/textRecogonition.dart';
 import 'package:safewalk/utils/map.dart';
+import 'package:safewalk/utils/nearPlaces.dart';
 import 'package:safewalk/utils/objectdetect.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
@@ -151,7 +152,7 @@ class _HomePageState extends State<HomePage> {
 
              Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => MapExample()),
+              MaterialPageRoute(builder: (context) => NearbyPlacesScreen()),
             );          }
         },
         child: Column(

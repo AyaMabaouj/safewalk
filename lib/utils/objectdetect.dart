@@ -165,40 +165,63 @@ void _startStreaming() {
     );
   }
 
-  Widget _buildRecognitionOverlay() {
-    return Positioned.fill(
-      child: Container(
-        margin: EdgeInsets.all(16.0),
-        padding: EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: Colors.black54,
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: _currentRecognition.isNotEmpty
-            ? ListView.builder(
-          itemCount: _currentRecognition.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(
-                _currentRecognition[index]['label'] ?? 'Unknown',
-                style: TextStyle(color: Colors.white),
-              ),
-              subtitle: Text(
-                'Confidence: ${(_currentRecognition[index]['confidence'] * 100).toStringAsFixed(2)}%',
-                style: TextStyle(color: Colors.white),
-              ),
-            );
-          },
-        )
-            : Center(
-          child: Text(
-            'No objects detected',
-            style: TextStyle(color: Colors.white),
+ Widget _buildRecognitionOverlay() {
+  return Positioned.fill(
+    child: Stack(
+      children: [
+        Container(
+          margin: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            color: Colors.transparent, // Changement de couleur en transparent pour que seule la bordure soit visible
+            borderRadius: BorderRadius.circular(8.0),
+            border: Border.all(color: Colors.red, width: 3), // Augmentation de la largeur de la bordure rouge
           ),
+          child: _currentRecognition.isNotEmpty
+              ? ListView.builder(
+                  itemCount: _currentRecognition.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(
+                        _currentRecognition[index]['label'] ?? 'Unknown',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      subtitle: Text(
+                        'Confidence: ${(_currentRecognition[index]['confidence'] * 100).toStringAsFixed(2)}%',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  },
+                )
+              : Center(
+                  child: Text(
+                    'No objects detected',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
         ),
-      ),
-    );
-  }
+        _currentRecognition.isNotEmpty
+            ? Positioned(
+                top: 8, // Positionnement du texte légèrement au-dessus du rectangle
+                left: 16,
+                right: 16,
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    _currentRecognition.first['label'] ?? 'Unknown',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
+              )
+            : SizedBox(),
+      ],
+    ),
+  );
+}
 
   @override
   void dispose() {

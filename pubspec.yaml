@@ -21,6 +21,7 @@ dependencies:
   provider: ^6.1.1
   flutter_mobile_vision_2: ^0.1.9
   flutter_langdetect: ^0.0.2
+  translator: ^1.0.0
   permission_handler: ^10.3.0
   speech_to_text: ^6.6.0
   flutter_local_notifications: ^16.3.2
